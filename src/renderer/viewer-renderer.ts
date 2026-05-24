@@ -250,6 +250,7 @@ export class ViewerRenderer {
 
     if (
       !state.settings.pageTurnAnimation ||
+      state.autoPageTurnEnabled ||
       this.isPageTurnAnimating ||
       getAdjacentPageIndexes(state, direction, this.isMobileViewport()).length === 0
     ) {
