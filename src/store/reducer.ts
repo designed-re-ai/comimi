@@ -1,0 +1,164 @@
+import {
+  calculateVisiblePageIndexes,
+  clampPageIndex,
+  getPageStep,
+  mergeSettings
+} from "../defaults";
+import type { ViewerAction, ViewerState } from "../types";
+
+export function reducer(state: ViewerState, action: ViewerAction): ViewerState {
+  switch (action.type) {
+    case "setManga": {
+      const currentPageIndex = clampPageIndex(
+        action.pageIndex ?? 0,
+        action.manga.pages.length
+      );
+
+      return withVisiblePages({
+        ...state,
+        manga: action.manga,
+        currentPageIndex,
+        zoomScale: 1,
+        panX: 0,
+        panY: 0
+      });
+    }
+
+    case "goToPage": {
+      const nextPageIndex = clampPageIndex(
+        action.pageIndex,
+        state.manga.pages.length
+      );
+      const alreadyReset =
+        state.zoomScale === 1 && state.panX === 0 && state.panY === 0;
+      if (nextPageIndex === state.currentPageIndex && alreadyReset) {
+        return state;
+      }
+      return withVisiblePages({
+        ...state,
+        currentPageIndex: nextPageIndex,
+        zoomScale: 1,
+        panX: 0,
+        panY: 0
+      });
+    }
+
+    case "nextPage": {
+      const step = getPageStep(state.settings, state.currentPageIndex);
+      return reducer(state, {
+        type: "goToPage",
+        pageIndex: state.currentPageIndex + step
+      });
+    }
+
+    case "previousPage": {
+      const step = getPageStep(state.settings, state.currentPageIndex);
+      return reducer(state, {
+        type: "goToPage",
+        pageIndex: state.currentPageIndex - step
+      });
+    }
+
+    case "setOverlayVisible":
+      return {
+        ...state,
+        overlayVisible: action.visible,
+        panel: action.visible ? state.panel : "none"
+      };
+
+    case "toggleAutoPageTurn":
+      return {
+        ...state,
+        autoPageTurnEnabled: !state.autoPageTurnEnabled
+      };
+
+    case "updateSettings": {
+      const settings = mergeSettings(state.settings, action.settings);
+      return withVisiblePages({
+        ...state,
+        settings,
+        layout: {
+          ...state.layout,
+          mode: settings.layoutMode
+        }
+      });
+    }
+
+    case "setLayoutMode":
+      return reducer(state, {
+        type: "updateSettings",
+        settings: { layoutMode: action.layoutMode }
+      });
+
+    case "setTheaterHeight":
+      return {
+        ...state,
+        layout: {
+          ...state.layout,
+          theaterHeightPx: Math.max(240, Math.round(action.heightPx))
+        }
+      };
+
+    case "setZoom":
+      return {
+        ...state,
+        zoomScale: clampZoom(action.scale, state),
+        panX: action.panX ?? state.panX,
+        panY: action.panY ?? state.panY
+      };
+
+    case "setPan":
+      return {
+        ...state,
+        panX: action.panX,
+        panY: action.panY
+      };
+
+    case "resetZoom":
+      return {
+        ...state,
+        zoomScale: 1,
+        panX: 0,
+        panY: 0
+      };
+
+    case "setPanel":
+      return {
+        ...state,
+        panel: action.panel,
+        overlayVisible: action.panel !== "none" ? true : state.overlayVisible
+      };
+
+    case "pushNotification":
+      return {
+        ...state,
+        notifications: [action.notification]
+      };
+
+    case "removeNotification":
+      return {
+        ...state,
+        notifications: state.notifications.filter(
+          (notification) => notification.id !== action.id
+        )
+      };
+  }
+}
+
+function withVisiblePages(state: ViewerState): ViewerState {
+  return {
+    ...state,
+    visiblePageIndexes: calculateVisiblePageIndexes(
+      state.currentPageIndex,
+      state.manga.pages.length,
+      state.settings
+    )
+  };
+}
+
+function clampZoom(scale: number, state: ViewerState): number {
+  return Math.min(
+    Math.max(scale, state.settings.zoom.min),
+    state.settings.zoom.max
+  );
+}
