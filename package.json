@@ -10,7 +10,6 @@
     "typescript"
   ],
   "license": "MIT",
-  "private": true,
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -26,6 +25,9 @@
     "locales",
     "docs"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite examples/preview --host 0.0.0.0",
     "build": "tsc --noEmit && vite build && tsc -p tsconfig.build.json",
