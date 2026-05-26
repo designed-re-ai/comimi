@@ -587,7 +587,7 @@ export class ViewerRenderer {
 
     const shouldPage =
       state.zoomScale <= 1 &&
-      Math.abs(deltaX) > 64 &&
+      Math.abs(deltaX) > 40 &&
       Math.abs(deltaX) > Math.abs(deltaY);
 
     if (!shouldPage) {
