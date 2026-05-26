@@ -24,7 +24,9 @@ export const viewerRootStyles = `
   overflow: hidden;
   user-select: none;
   touch-action: none;
-  transition: box-shadow 0.24s ease-out;
+  transition:
+    box-shadow 0.24s ease-out,
+    background-color 0.16s linear;
 }
 
 .comimi-root:focus {
@@ -37,6 +39,10 @@ export const viewerRootStyles = `
     max-width: 500px;
     aspect-ratio: 390 / 490;
   }
+}
+
+.comimi-root[data-bg="black"] {
+  --comimi-bg: #000;
 }
 
 .comimi-root[data-layout="theater"] {

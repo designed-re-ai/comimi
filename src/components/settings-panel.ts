@@ -1,5 +1,5 @@
 import { I18n } from "../i18n/i18n";
-import type { ReadingDirection, ViewerState } from "../types";
+import type { BackgroundColor, ReadingDirection, ViewerState } from "../types";
 import type { RendererCallbacks } from "../renderer/renderer-callbacks";
 import { RangeSlider, Selectbox, ToggleSwitch } from "./inputs";
 
@@ -12,12 +12,14 @@ export class SettingsPanel {
   private localeLabel: HTMLDivElement;
   private coverLabel: HTMLDivElement;
   private directionLabel: HTMLDivElement;
+  private backgroundColorLabel: HTMLDivElement;
   private animationLabel: HTMLDivElement;
   private intervalLabel: HTMLDivElement;
 
   private localeSelect: Selectbox;
   private coverToggle: ToggleSwitch;
   private directionSelect: Selectbox;
+  private backgroundColorSelect: Selectbox;
   private animationToggle: ToggleSwitch;
   private intervalSlider: RangeSlider;
 
@@ -51,6 +53,11 @@ export class SettingsPanel {
         readingDirection: direction as ReadingDirection
       })
     );
+    this.backgroundColorSelect = new Selectbox((backgroundColor) =>
+      this.callbacks.updateSettings({
+        backgroundColor: backgroundColor as BackgroundColor
+      })
+    );
     this.animationToggle = new ToggleSwitch((pageTurnAnimation) =>
       this.callbacks.updateSettings({ pageTurnAnimation })
     );
@@ -65,6 +72,7 @@ export class SettingsPanel {
     this.localeLabel = this.createLabel();
     this.coverLabel = this.createLabel();
     this.directionLabel = this.createLabel();
+    this.backgroundColorLabel = this.createLabel();
     this.animationLabel = this.createLabel();
     this.intervalLabel = this.createLabel();
 
@@ -74,7 +82,11 @@ export class SettingsPanel {
       this.section(this.coverLabel, this.coverToggle.getElement()),
       this.section(this.directionLabel, this.directionSelect.getElement()),
       this.section(this.animationLabel, this.animationToggle.getElement()),
-      this.section(this.intervalLabel, this.intervalSlider.getElement())
+      this.section(this.intervalLabel, this.intervalSlider.getElement()),
+      this.section(
+        this.backgroundColorLabel,
+        this.backgroundColorSelect.getElement()
+      )
     );
 
     this.body.append(this.inner);
@@ -86,6 +98,9 @@ export class SettingsPanel {
     this.localeLabel.textContent = "Language";
     this.coverLabel.textContent = this.i18n.t("settings.cover");
     this.directionLabel.textContent = this.i18n.t("settings.direction");
+    this.backgroundColorLabel.textContent = this.i18n.t(
+      "settings.backgroundColor"
+    );
     this.animationLabel.textContent = this.i18n.t("settings.animation");
     this.intervalLabel.textContent = this.i18n.t("settings.interval");
 
@@ -97,11 +112,22 @@ export class SettingsPanel {
       { label: this.i18n.t("settings.direction.rtl"), value: "rtl" },
       { label: this.i18n.t("settings.direction.ltr"), value: "ltr" }
     ]);
+    this.backgroundColorSelect.setOptions([
+      {
+        label: this.i18n.t("settings.backgroundColor.white"),
+        value: "white"
+      },
+      {
+        label: this.i18n.t("settings.backgroundColor.black"),
+        value: "black"
+      }
+    ]);
     this.intervalSlider.setUnit(this.i18n.t("settings.interval.unit"));
 
     this.localeSelect.setValue(state.settings.locale);
     this.coverToggle.setChecked(state.settings.hasCover);
     this.directionSelect.setValue(state.settings.readingDirection);
+    this.backgroundColorSelect.setValue(state.settings.backgroundColor);
     this.animationToggle.setChecked(state.settings.pageTurnAnimation);
     this.intervalSlider.setValue(
       Math.round(state.settings.autoPageTurnIntervalMs / 1000)

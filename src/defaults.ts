@@ -10,6 +10,7 @@ export const defaultSettings: ViewerSettings = {
   layoutMode: "inline",
   autoPageTurnIntervalMs: 5000,
   pageTurnAnimation: true,
+  backgroundColor: "white",
   zoom: {
     min: 1,
     max: 4,

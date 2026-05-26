@@ -26,6 +26,9 @@ export const settingsPanelStyles = `
 .comimi-settings-panel-body {
   position: relative;
   width: 100%;
+  max-height: calc(var(--view-height, 100vh) - 62px - 56px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .comimi-settings-panel-inner {
@@ -53,11 +56,4 @@ export const settingsPanelStyles = `
   font-weight: 400;
 }
 
-@media (max-width: 767px) {
-  .comimi-settings-panel-body {
-    max-height: calc(var(--view-height, 100vh) - 62px - 56px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
 `;

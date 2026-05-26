@@ -97,6 +97,7 @@ export class ViewerRenderer {
     this.cleanup = [];
     this.i18n.setLocale(state.settings.locale);
     this.root.dataset.layout = state.layout.mode;
+    this.root.dataset.bg = state.settings.backgroundColor;
 
     if (state.layout.mode === "theater" && state.layout.theaterHeightPx) {
       this.root.style.height = `${state.layout.theaterHeightPx}px`;

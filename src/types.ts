@@ -1,5 +1,6 @@
 export type ReadingDirection = "rtl" | "ltr";
 export type PageTurnMode = "single" | "spread";
+export type BackgroundColor = "white" | "black";
 export type LayoutMode =
   | "inline"
   | "theater"
@@ -45,6 +46,7 @@ export interface ViewerSettings {
   layoutMode: LayoutMode;
   autoPageTurnIntervalMs: number;
   pageTurnAnimation: boolean;
+  backgroundColor: BackgroundColor;
   zoom: {
     min: number;
     max: number;
