@@ -363,6 +363,24 @@ export class ViewerRenderer {
         return;
       }
 
+      if (!state.overlayVisible) {
+        const rect = this.root.getBoundingClientRect();
+        const ratio = (event.clientX - rect.left) / rect.width;
+        if (ratio < 0.2 || ratio >= 0.8) {
+          const side: "left" | "right" = ratio < 0.2 ? "left" : "right";
+          const goNext =
+            state.settings.readingDirection === "rtl"
+              ? side === "left"
+              : side === "right";
+          if (goNext) {
+            this.callbacks.nextPage();
+          } else {
+            this.callbacks.previousPage();
+          }
+          return;
+        }
+      }
+
       this.callbacks.toggleOverlay();
     };
     const onWheel = (event: WheelEvent) => {
