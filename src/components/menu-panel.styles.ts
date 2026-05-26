@@ -192,14 +192,17 @@ export const menuPanelStyles = `
 }
 
 .comimi-page-list-inner {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
   box-sizing: border-box;
-  padding: 22px;
+  padding: 0 22px;
   max-height: 315px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.comimi-page-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .comimi-page-list-item {
@@ -240,13 +243,16 @@ export const menuPanelStyles = `
 }
 
 .comimi-shortcut-inner {
-  display: grid;
-  row-gap: 22px;
   box-sizing: border-box;
-  padding: 22px;
+  padding: 0 22px;
   max-height: 315px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.comimi-shortcut-grid {
+  display: grid;
+  row-gap: 22px;
 }
 
 .comimi-shortcut-section {

@@ -34,7 +34,7 @@ export const settingsPanelStyles = `
 .comimi-settings-panel-inner {
   box-sizing: border-box;
   position: relative;
-  padding: 16px 20px 22px;
+  padding: 0 20px;
 }
 
 .comimi-settings-panel-title {

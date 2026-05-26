@@ -3,6 +3,7 @@ import type { ViewerState } from "../types";
 import type { RendererCallbacks } from "../renderer/renderer-callbacks";
 import { icon } from "./icons";
 import { renderRabbitMascot } from "./rabbit-mascot";
+import { bindScrollFade } from "./scroll-fade";
 
 type MenuView = "menu" | "shortcut" | "pageList";
 
@@ -254,7 +255,13 @@ export class MenuPanel {
     const inner = document.createElement("div");
     inner.className = "comimi-shortcut-inner";
 
-    inner.append(
+    const grid = document.createElement("div");
+    grid.className = "comimi-shortcut-grid";
+    inner.append(grid);
+
+    bindScrollFade(inner);
+
+    grid.append(
       this.shortcutSection("shortcut.section.page", [
         [["←", "Space"], "shortcut.moveLeft"],
         [["→", "Space + Shift"], "shortcut.moveRight"],
@@ -292,8 +299,14 @@ export class MenuPanel {
     const inner = document.createElement("div");
     inner.className = "comimi-page-list-inner";
 
+    const grid = document.createElement("div");
+    grid.className = "comimi-page-list-grid";
+    inner.append(grid);
+
+    bindScrollFade(inner);
+
     view.append(inner, this.renderBackButton());
-    return [view, inner];
+    return [view, grid];
   }
 
   private shortcutSection(

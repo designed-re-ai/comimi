@@ -2,6 +2,7 @@ import { I18n } from "../i18n/i18n";
 import type { BackgroundColor, ReadingDirection, ViewerState } from "../types";
 import type { RendererCallbacks } from "../renderer/renderer-callbacks";
 import { RangeSlider, Selectbox, ToggleSwitch } from "./inputs";
+import { bindScrollFade } from "./scroll-fade";
 
 export class SettingsPanel {
   private root: HTMLDivElement;
@@ -91,6 +92,8 @@ export class SettingsPanel {
 
     this.body.append(this.inner);
     this.root.append(this.body);
+
+    bindScrollFade(this.body);
   }
 
   update(state: ViewerState): void {

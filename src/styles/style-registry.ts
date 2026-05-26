@@ -9,6 +9,7 @@ import { menuPanelStyles } from "../components/menu-panel.styles";
 import { notificationsStyles } from "../components/notifications.styles";
 import { pageStageStyles } from "../components/page-stage.styles";
 import { rabbitMascotStyles } from "../components/rabbit-mascot.styles";
+import { scrollFadeStyles } from "../components/scroll-fade.styles";
 import { settingsPanelStyles } from "../components/settings-panel.styles";
 import { splashScreenStyles } from "../components/splash-screen.styles";
 import { tooltipStyles } from "../components/tooltip.styles";
@@ -33,7 +34,8 @@ const viewerStyles = [
   menuPanelStyles,
   notificationsStyles,
   rabbitMascotStyles,
-  splashScreenStyles
+  splashScreenStyles,
+  scrollFadeStyles
 ].join("\n");
 
 export function ensureViewerStyles(): void {
