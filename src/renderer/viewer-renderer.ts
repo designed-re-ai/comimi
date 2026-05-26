@@ -546,16 +546,6 @@ export class ViewerRenderer {
       this.handleSwipeEnd(deltaX, deltaY, state);
       this.touchStart = undefined;
     };
-    const onDoubleClick = (event: MouseEvent) => {
-      if (this.isInteractiveTarget(event.target)) {
-        return;
-      }
-
-      state.zoomScale > 1
-        ? this.callbacks.resetZoom()
-        : this.callbacks.setZoom(2);
-    };
-
     const onCaptureClick = (event: MouseEvent) => {
       if (this.suppressNextClick || this.isPageTurnAnimating) return;
       if (state.panel !== "settings") return;
@@ -574,7 +564,6 @@ export class ViewerRenderer {
     this.root.addEventListener("touchstart", onTouchStart, { passive: false });
     this.root.addEventListener("touchmove", onTouchMove, { passive: false });
     this.root.addEventListener("touchend", onTouchEnd);
-    this.root.addEventListener("dblclick", onDoubleClick);
 
     this.cleanup.push(
       () => this.root.removeEventListener("click", onCaptureClick, true),
@@ -585,8 +574,7 @@ export class ViewerRenderer {
       () => window.removeEventListener("mouseup", onMouseUp),
       () => this.root.removeEventListener("touchstart", onTouchStart),
       () => this.root.removeEventListener("touchmove", onTouchMove),
-      () => this.root.removeEventListener("touchend", onTouchEnd),
-      () => this.root.removeEventListener("dblclick", onDoubleClick)
+      () => this.root.removeEventListener("touchend", onTouchEnd)
     );
   }
 
