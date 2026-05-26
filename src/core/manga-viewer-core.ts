@@ -302,6 +302,7 @@ export class MangaViewerCore implements MangaViewerInstance {
           break;
         case "n":
         case "N":
+        case "Escape":
           event.preventDefault();
           void this.setLayoutMode("inline");
           break;
