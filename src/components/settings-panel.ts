@@ -109,7 +109,11 @@ export class SettingsPanel {
 
     this.localeSelect.setOptions([
       { label: "日本語", value: "ja" },
-      { label: "English", value: "en" }
+      { label: "English", value: "en" },
+      { label: "简体中文", value: "zh-CN" },
+      { label: "한국어", value: "ko" },
+      { label: "ภาษาไทย", value: "th" },
+      { label: "Indonesia", value: "id" }
     ]);
     this.directionSelect.setOptions([
       { label: this.i18n.t("settings.direction.rtl"), value: "rtl" },

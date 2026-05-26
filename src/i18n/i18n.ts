@@ -1,5 +1,9 @@
 import enTranslations from "../../locales/en.json";
+import idTranslations from "../../locales/id.json";
 import jaTranslations from "../../locales/ja.json";
+import koTranslations from "../../locales/ko.json";
+import thTranslations from "../../locales/th.json";
+import zhCNTranslations from "../../locales/zh-CN.json";
 import type { TranslationMap } from "../types";
 
 export class I18n {
@@ -10,7 +14,11 @@ export class I18n {
     this.locale = locale;
     this.translations = {
       ja: jaTranslations as TranslationMap,
-      en: enTranslations as TranslationMap
+      en: enTranslations as TranslationMap,
+      "zh-CN": zhCNTranslations as TranslationMap,
+      ko: koTranslations as TranslationMap,
+      th: thTranslations as TranslationMap,
+      id: idTranslations as TranslationMap
     };
 
     if (customTranslations) {
