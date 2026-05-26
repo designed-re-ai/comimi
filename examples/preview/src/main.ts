@@ -90,7 +90,27 @@ createMangaViewer(container, {
   },
   events: {
     pageChange: ({ pageIndex }) => {
-      console.log("pageChange", pageIndex + 1);
+      console.log("[comimi] pageChange", pageIndex + 1);
     }
+  },
+  resolvePageSrc: async ({ page, pageIndex, isSpread }) => {
+    console.log("[comimi] resolvePageSrc:start", {
+      pageIndex,
+      pageId: page.id,
+      src: page.src,
+      isSpread
+    });
+    const start = performance.now();
+    // ここで実際は復号や認証付き fetch を行う想定。
+    // デバッグ用に擬似的な遅延だけ入れて元の src を返す。
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const elapsed = Math.round(performance.now() - start);
+    console.log("[comimi] resolvePageSrc:done", {
+      pageIndex,
+      pageId: page.id,
+      elapsedMs: elapsed,
+      isSpread
+    });
+    return page.src;
   }
 });

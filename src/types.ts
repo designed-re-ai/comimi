@@ -93,7 +93,18 @@ export interface MangaViewerOptions {
   };
   className?: string;
   events?: Partial<ViewerEventHandlersMap>;
+  resolvePageSrc?: PageSrcResolver;
 }
+
+export interface PageSrcContext {
+  page: ImagePage;
+  pageIndex: number;
+  isSpread: boolean;
+}
+
+export type PageSrcResolver = (
+  context: PageSrcContext
+) => string | Promise<string>;
 
 export interface MangaViewerInstance {
   destroy(): void;

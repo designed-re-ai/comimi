@@ -1,6 +1,11 @@
 import { AssetLoader } from "../core/asset-loader";
 import { I18n } from "../i18n/i18n";
-import type { MangaPage, ViewerState } from "../types";
+import type {
+  ImagePage,
+  MangaPage,
+  PageSrcResolver,
+  ViewerState
+} from "../types";
 import { renderErrorIcon } from "./error-icon";
 import { renderLoadingIcon } from "./loading-icon";
 import {
@@ -13,6 +18,7 @@ export interface PageStageOptions {
   assetLoader: AssetLoader;
   i18n: I18n;
   isMobileViewport: () => boolean;
+  resolvePageSrc?: PageSrcResolver;
 }
 
 interface CachedSlot {
@@ -75,7 +81,7 @@ export class PageStage {
         if (!page) {
           continue;
         }
-        const cached = this.getOrBuildSlot(state, page, pageIndex);
+        const cached = this.getOrBuildSlot(state, page, pageIndex, isSpread);
         cached.slot.dataset.spread = String(isSpread);
         cached.slot.dataset.position = isSpread
           ? visualIndex === 0
@@ -98,13 +104,14 @@ export class PageStage {
   private getOrBuildSlot(
     state: ViewerState,
     page: MangaPage,
-    pageIndex: number
+    pageIndex: number,
+    isSpread: boolean
   ): CachedSlot {
     const existing = this.slots.get(page.id);
     if (existing) {
       return existing;
     }
-    const built = this.buildSlot(state, page, pageIndex);
+    const built = this.buildSlot(state, page, pageIndex, isSpread);
     this.slots.set(page.id, built);
     return built;
   }
@@ -112,7 +119,8 @@ export class PageStage {
   private buildSlot(
     state: ViewerState,
     page: MangaPage,
-    pageIndex: number
+    pageIndex: number,
+    isSpread: boolean
   ): CachedSlot {
     const slot = document.createElement("div");
     slot.className = "comimi-page";
@@ -148,7 +156,12 @@ export class PageStage {
 
     let promise = this.resolvePromises.get(imageKey);
     if (!promise) {
-      promise = this.options.assetLoader.resolveImageSource(state.manga.id, page);
+      const resolver = this.options.resolvePageSrc;
+      promise = resolver
+        ? Promise.resolve(
+            resolver({ page: page as ImagePage, pageIndex, isSpread })
+          )
+        : this.options.assetLoader.resolveImageSource(state.manga.id, page);
       this.resolvePromises.set(imageKey, promise);
       promise
         .then((src) => {

@@ -16,7 +16,7 @@ import { renderSplashScreen } from "../components/splash-screen";
 import { createViewerRoot } from "../components/viewer-root";
 import { I18n } from "../i18n/i18n";
 import { ensureViewerStyles } from "../styles/style-registry";
-import type { ViewerState } from "../types";
+import type { PageSrcResolver, ViewerState } from "../types";
 import type { RendererCallbacks } from "./renderer-callbacks";
 
 interface DragStart {
@@ -54,13 +54,15 @@ export class ViewerRenderer {
     private callbacks: RendererCallbacks,
     private assetLoader: AssetLoader,
     private i18n: I18n,
-    className?: string
+    className?: string,
+    resolvePageSrc?: PageSrcResolver
   ) {
     ensureViewerStyles();
     this.pageStage = new PageStage({
       assetLoader: this.assetLoader,
       i18n: this.i18n,
-      isMobileViewport: () => this.isMobileViewport()
+      isMobileViewport: () => this.isMobileViewport(),
+      resolvePageSrc
     });
     this.root = createViewerRoot({ className });
     this.container.replaceChildren(this.root);

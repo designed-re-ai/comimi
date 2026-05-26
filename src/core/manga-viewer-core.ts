@@ -79,7 +79,8 @@ export class MangaViewerCore implements MangaViewerInstance {
       callbacks,
       this.assetLoader,
       this.i18n,
-      options.className
+      options.className,
+      options.resolvePageSrc
     );
 
     for (const [eventName, handler] of Object.entries(
