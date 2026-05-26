@@ -31,7 +31,7 @@ if (!container) {
 createMangaViewer(container, {
   manga: {
     id: "sample-comic-fullscreen",
-    title: "モノクロ世界にようこそ (Fullscreen lock)",
+    title: "全画面に固定",
     author: "yui540",
     pages: imagePages
   },

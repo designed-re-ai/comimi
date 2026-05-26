@@ -47,7 +47,7 @@ if (!container) {
 createMangaViewer(container, {
   manga: {
     id: "sample-comic-mascot",
-    title: "モノクロ世界にようこそ (Custom mascot)",
+    title: "マスコット差し替え",
     author: "yui540",
     pages: imagePages
   },
