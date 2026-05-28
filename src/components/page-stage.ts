@@ -55,6 +55,11 @@ export class PageStage {
     this.root.dataset.dragging = "false";
     this.root.style.transition = "none";
     this.root.style.transform = "";
+    // Force synchronous layout so the browser commits the new transform under
+    // `transition: none` before we restore transitions. Without this, Android/
+    // Chromium can batch the style writes and animate from the old offset back
+    // to 0 (a visible "spring back" in the opposite direction of the page turn).
+    void this.root.offsetWidth;
     if (typeof requestAnimationFrame === "function") {
       requestAnimationFrame(() => {
         this.root.style.transition = "";
