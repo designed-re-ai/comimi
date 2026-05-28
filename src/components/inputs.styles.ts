@@ -42,6 +42,11 @@ export const inputsStyles = `
   cursor: not-allowed;
 }
 
+.comimi-selectbox-select option {
+  color: #333;
+  background-color: #fff;
+}
+
 .comimi-selectbox-label {
   position: relative;
   display: block;
