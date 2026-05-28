@@ -21,7 +21,6 @@
   "settings.backgroundColor.black": "黑色",
   "settings.interval": "自动播放间隔",
   "settings.interval.unit": "秒",
-  "settings.animation": "翻页动画",
   "settings.direction.rtl": "向右",
   "settings.direction.ltr": "向左",
   "menu.openShortcuts": "键盘快捷键",

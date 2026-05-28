@@ -21,7 +21,6 @@
   "settings.backgroundColor.black": "黒",
   "settings.interval": "自動再生の秒数",
   "settings.interval.unit": "秒",
-  "settings.animation": "ページ移動アニメーション",
   "settings.direction.rtl": "右",
   "settings.direction.ltr": "左",
   "menu.openShortcuts": "キーボードショートカット",

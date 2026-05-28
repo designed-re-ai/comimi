@@ -21,7 +21,6 @@
   "settings.backgroundColor.black": "검정",
   "settings.interval": "자동 재생 간격",
   "settings.interval.unit": "초",
-  "settings.animation": "페이지 넘김 애니메이션",
   "settings.direction.rtl": "오른쪽",
   "settings.direction.ltr": "왼쪽",
   "menu.openShortcuts": "키보드 단축키",

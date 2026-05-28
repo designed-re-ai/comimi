@@ -257,8 +257,6 @@ export class ViewerRenderer {
     window.clearTimeout(this.pageTurnTimer);
 
     if (
-      !state.settings.pageTurnAnimation ||
-      state.autoPageTurnEnabled ||
       this.isPageTurnAnimating ||
       getAdjacentPageIndexes(state, direction, this.isMobileViewport()).length === 0
     ) {

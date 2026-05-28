@@ -45,7 +45,6 @@ export interface ViewerSettings {
   pageTurnMode: PageTurnMode;
   layoutMode: LayoutMode;
   autoPageTurnIntervalMs: number;
-  pageTurnAnimation: boolean;
   backgroundColor: BackgroundColor;
   zoom: {
     min: number;

@@ -141,7 +141,6 @@ interface HtmlPage {
 | `pageTurnMode` | `"single"` | `"single"` / `"spread"`（2ページ見開き） |
 | `layoutMode` | `"inline"` | `"inline"`, `"wide"`, `"browserFullscreen"`, `"nativeFullscreen"` |
 | `autoPageTurnIntervalMs` | `5000` | 自動再生の間隔 (ms) |
-| `pageTurnAnimation` | `true` | ページめくり時のスライドアニメ |
 | `backgroundColor` | `"white"` | `"white"` / `"black"`（ビューワー本体の背景色） |
 | `zoom.min` / `.max` / `.step` | `1` / `4` / `0.25` | ズームの範囲とステップ |
 
@@ -193,9 +192,10 @@ createMangaViewer(container, {
 
 ## ジェスチャー
 
-- 中央 60% のクリック / タップ: オーバーレイの表示切替
-- 左 20% / 右 20% のクリック / タップ（オーバーレイ閉時のみ）: 前 / 次ページ（`readingDirection` に応じて向きが変わる）
-- スワイプ: ページ移動（しきい値 40px、横方向優先）
+- 中央 40% のクリック / タップ: オーバーレイの表示切替
+- 左 30% / 右 30% のクリック / タップ（オーバーレイ閉時のみ）: 前 / 次ページ（`readingDirection` に応じて向きが変わる）。アニメーションなしで即時切替
+- 左右ボタン / キーボード（←→Space）: 同じく即時切替
+- スワイプ / ドラッグ: ページ移動。しきい値 40px、横方向優先。**こちらは常にスライドアニメーションする**
 - ピンチ: ズーム（`zoom.min`〜`zoom.max` でクランプ）
 - ズーム中のドラッグ: パン（ページの範囲内にクランプ）
 
@@ -203,7 +203,7 @@ createMangaViewer(container, {
 
 `storage.enabled` を `false` にしない限り、`indexedDB` が利用可能な環境では以下を自動で保存します。
 
-- 全体設定（locale, readingDirection, hasCover, pageTurnMode, animation, autoPageTurnIntervalMs）
+- 全体設定（locale, readingDirection, hasCover, pageTurnMode, autoPageTurnIntervalMs, backgroundColor）
 - 現在のレイアウトモードと wide の高さ
 - 漫画ごとの現在ページ（`manga.id` をキーに保存）
 

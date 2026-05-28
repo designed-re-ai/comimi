@@ -21,7 +21,6 @@
   "settings.backgroundColor.black": "Black",
   "settings.interval": "Auto play interval",
   "settings.interval.unit": "s",
-  "settings.animation": "Page turn animation",
   "settings.direction.rtl": "Right to left",
   "settings.direction.ltr": "Left to right",
   "menu.openShortcuts": "Keyboard shortcuts",

@@ -169,30 +169,14 @@ export class MangaViewerCore implements MangaViewerInstance {
     if (this.renderer.isAnimatingPageTurn()) {
       return;
     }
-
-    const state = this.store.getState();
-    const animated = this.renderer.animatePageTurn(state, "next", () =>
-      this.commitNextPage()
-    );
-
-    if (!animated) {
-      this.commitNextPage();
-    }
+    this.commitNextPage();
   }
 
   previousPage(): void {
     if (this.renderer.isAnimatingPageTurn()) {
       return;
     }
-
-    const state = this.store.getState();
-    const animated = this.renderer.animatePageTurn(state, "previous", () =>
-      this.commitPreviousPage()
-    );
-
-    if (!animated) {
-      this.commitPreviousPage();
-    }
+    this.commitPreviousPage();
   }
 
   private commitNextPage(): void {

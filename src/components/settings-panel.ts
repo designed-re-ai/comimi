@@ -14,14 +14,12 @@ export class SettingsPanel {
   private coverLabel: HTMLDivElement;
   private directionLabel: HTMLDivElement;
   private backgroundColorLabel: HTMLDivElement;
-  private animationLabel: HTMLDivElement;
   private intervalLabel: HTMLDivElement;
 
   private localeSelect: Selectbox;
   private coverToggle: ToggleSwitch;
   private directionSelect: Selectbox;
   private backgroundColorSelect: Selectbox;
-  private animationToggle: ToggleSwitch;
   private intervalSlider: RangeSlider;
 
   constructor(
@@ -59,9 +57,6 @@ export class SettingsPanel {
         backgroundColor: backgroundColor as BackgroundColor
       })
     );
-    this.animationToggle = new ToggleSwitch((pageTurnAnimation) =>
-      this.callbacks.updateSettings({ pageTurnAnimation })
-    );
     this.intervalSlider = new RangeSlider((seconds) =>
       this.callbacks.updateSettings({
         autoPageTurnIntervalMs: Math.max(1, seconds) * 1000
@@ -74,7 +69,6 @@ export class SettingsPanel {
     this.coverLabel = this.createLabel();
     this.directionLabel = this.createLabel();
     this.backgroundColorLabel = this.createLabel();
-    this.animationLabel = this.createLabel();
     this.intervalLabel = this.createLabel();
 
     this.inner.append(
@@ -82,7 +76,6 @@ export class SettingsPanel {
       this.section(this.localeLabel, this.localeSelect.getElement()),
       this.section(this.coverLabel, this.coverToggle.getElement()),
       this.section(this.directionLabel, this.directionSelect.getElement()),
-      this.section(this.animationLabel, this.animationToggle.getElement()),
       this.section(this.intervalLabel, this.intervalSlider.getElement()),
       this.section(
         this.backgroundColorLabel,
@@ -104,7 +97,6 @@ export class SettingsPanel {
     this.backgroundColorLabel.textContent = this.i18n.t(
       "settings.backgroundColor"
     );
-    this.animationLabel.textContent = this.i18n.t("settings.animation");
     this.intervalLabel.textContent = this.i18n.t("settings.interval");
 
     this.localeSelect.setOptions([
@@ -135,7 +127,6 @@ export class SettingsPanel {
     this.coverToggle.setChecked(state.settings.hasCover);
     this.directionSelect.setValue(state.settings.readingDirection);
     this.backgroundColorSelect.setValue(state.settings.backgroundColor);
-    this.animationToggle.setChecked(state.settings.pageTurnAnimation);
     this.intervalSlider.setValue(
       Math.round(state.settings.autoPageTurnIntervalMs / 1000)
     );
