@@ -483,6 +483,34 @@ export const controlsDockStyles = `
   }
 }
 
+/* --- Autoplay progress shown outside the dock (overlay closed) -------- */
+
+.comimi-autoplay-overlay-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  transition: opacity 0.16s linear;
+}
+
+.comimi-autoplay-overlay-progress[data-visible="true"] {
+  opacity: 1;
+}
+
+.comimi-autoplay-overlay-progress-bar {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: #666;
+  animation: comimi-autoplay-progress 3s linear 0s infinite;
+}
+
 @media (max-width: 767px) {
   .comimi-controls-dock {
     bottom: 0;

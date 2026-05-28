@@ -48,6 +48,8 @@ export class ViewerRenderer {
   private controlsDock?: ControlsDock;
   private resizeHandle?: HTMLDivElement;
   private viewSizeObserver?: ResizeObserver;
+  private autoplayOverlayProgress?: HTMLDivElement;
+  private autoplayOverlayProgressBar?: HTMLSpanElement;
 
   constructor(
     private container: HTMLElement,
@@ -138,7 +140,8 @@ export class ViewerRenderer {
         child !== menuPanelEl &&
         child !== viewModeSwitcherEl &&
         child !== controlsDockEl &&
-        child !== this.splash
+        child !== this.splash &&
+        child !== this.autoplayOverlayProgress
       ) {
         child.remove();
       }
@@ -176,6 +179,8 @@ export class ViewerRenderer {
     this.menuPanel.update(renderState);
     this.viewModeSwitcher?.update(renderState);
     this.controlsDock.update(renderState, this.isMobileViewport());
+
+    this.syncAutoplayOverlayProgress(state);
 
     if (this.splash && this.splash.parentNode !== this.root) {
       this.root.append(this.splash);
@@ -275,6 +280,35 @@ export class ViewerRenderer {
 
   isMobileViewport(): boolean {
     return window.matchMedia("(max-width: 767px)").matches;
+  }
+
+  private syncAutoplayOverlayProgress(state: ViewerState): void {
+    if (!state.autoPageTurnEnabled) {
+      if (this.autoplayOverlayProgress) {
+        this.autoplayOverlayProgress.remove();
+        this.autoplayOverlayProgress = undefined;
+        this.autoplayOverlayProgressBar = undefined;
+      }
+      return;
+    }
+
+    if (!this.autoplayOverlayProgress) {
+      this.autoplayOverlayProgress = document.createElement("div");
+      this.autoplayOverlayProgress.className = "comimi-autoplay-overlay-progress";
+      this.autoplayOverlayProgressBar = document.createElement("span");
+      this.autoplayOverlayProgressBar.className =
+        "comimi-autoplay-overlay-progress-bar";
+      this.autoplayOverlayProgress.append(this.autoplayOverlayProgressBar);
+    }
+
+    if (this.autoplayOverlayProgress.parentNode !== this.root) {
+      this.root.appendChild(this.autoplayOverlayProgress);
+    }
+
+    this.autoplayOverlayProgress.dataset.visible = String(
+      !state.overlayVisible
+    );
+    this.autoplayOverlayProgressBar!.style.animationDuration = `${state.settings.autoPageTurnIntervalMs}ms`;
   }
 
   private clampPan(
