@@ -33,7 +33,14 @@ export interface ImagePage extends BasePage {
 
 export interface HtmlPage extends BasePage {
   type: "html";
-  html: string;
+  /** HTML markup injected via innerHTML. Ignored when `element` is provided. */
+  html?: string;
+  /**
+   * A pre-built host element appended directly into the page frame.
+   * Use this to mount framework-managed content (e.g. a React portal target)
+   * whose contents update independently of the viewer.
+   */
+  element?: HTMLElement;
   sandbox?: string;
   aspectRatio?: number;
 }

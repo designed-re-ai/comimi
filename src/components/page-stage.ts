@@ -133,7 +133,11 @@ export class PageStage {
     if (page.type === "html") {
       const frame = document.createElement("div");
       frame.className = "comimi-html-page";
-      frame.innerHTML = page.html;
+      if (page.element) {
+        frame.append(page.element);
+      } else if (page.html != null) {
+        frame.innerHTML = page.html;
+      }
       frame.style.transform = pageTransform(state);
       slot.append(frame);
       return { slot, img: null };
