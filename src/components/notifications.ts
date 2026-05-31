@@ -1,24 +1,51 @@
 import type { ViewerState } from "../types";
 
-export function renderNotifications(state: ViewerState): HTMLElement {
-  const wrap = document.createElement("div");
-  wrap.className = "comimi-notifications";
+export class Notifications {
+  private root: HTMLDivElement;
+  private toasts = new Map<string, HTMLDivElement>();
 
-  for (const notification of state.notifications) {
-    const toast = document.createElement("div");
-    toast.className = "comimi-toast";
-    toast.dataset.tone = notification.tone ?? "info";
-
-    const dot = document.createElement("span");
-    dot.className = "comimi-toast-dot";
-
-    const text = document.createElement("span");
-    text.className = "comimi-toast-text";
-    text.textContent = notification.message;
-
-    toast.append(dot, text);
-    wrap.append(toast);
+  constructor() {
+    this.root = document.createElement("div");
+    this.root.className = "comimi-notifications";
   }
 
-  return wrap;
+  getElement(): HTMLDivElement {
+    return this.root;
+  }
+
+  update(state: ViewerState): void {
+    const liveIds = new Set(state.notifications.map((n) => n.id));
+
+    for (const [id, toast] of this.toasts) {
+      if (!liveIds.has(id)) {
+        toast.remove();
+        this.toasts.delete(id);
+      }
+    }
+
+    for (const notification of state.notifications) {
+      const existing = this.toasts.get(notification.id);
+      if (existing) {
+        existing.dataset.tone = notification.tone ?? "info";
+        const text = existing.querySelector(".comimi-toast-text");
+        if (text) text.textContent = notification.message;
+        continue;
+      }
+
+      const toast = document.createElement("div");
+      toast.className = "comimi-toast";
+      toast.dataset.tone = notification.tone ?? "info";
+
+      const dot = document.createElement("span");
+      dot.className = "comimi-toast-dot";
+
+      const text = document.createElement("span");
+      text.className = "comimi-toast-text";
+      text.textContent = notification.message;
+
+      toast.append(dot, text);
+      this.root.append(toast);
+      this.toasts.set(notification.id, toast);
+    }
+  }
 }

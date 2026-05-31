@@ -11,7 +11,7 @@ import {
   isSwipeToNext
 } from "../components/page-layout";
 import { PageStage } from "../components/page-stage";
-import { renderNotifications } from "../components/notifications";
+import { Notifications } from "../components/notifications";
 import { renderSplashScreen } from "../components/splash-screen";
 import { createViewerRoot } from "../components/viewer-root";
 import { I18n } from "../i18n/i18n";
@@ -50,6 +50,7 @@ export class ViewerRenderer {
   private viewSizeObserver?: ResizeObserver;
   private autoplayOverlayProgress?: HTMLDivElement;
   private autoplayOverlayProgressBar?: HTMLSpanElement;
+  private notifications?: Notifications;
 
   constructor(
     private container: HTMLElement,
@@ -128,10 +129,14 @@ export class ViewerRenderer {
     if (!this.controlsDock) {
       this.controlsDock = new ControlsDock(this.callbacks, this.i18n, this.mascot);
     }
+    if (!this.notifications) {
+      this.notifications = new Notifications();
+    }
     const stageEl = this.pageStage.getElement();
     const menuPanelEl = this.menuPanel.getElement();
     const viewModeSwitcherEl = this.viewModeSwitcher?.getElement();
     const controlsDockEl = this.controlsDock.getElement();
+    const notificationsEl = this.notifications.getElement();
 
     // Remove non-persistent children, keep persistent ones in DOM
     Array.from(this.root.children).forEach((child) => {
@@ -141,7 +146,8 @@ export class ViewerRenderer {
         child !== viewModeSwitcherEl &&
         child !== controlsDockEl &&
         child !== this.splash &&
-        child !== this.autoplayOverlayProgress
+        child !== this.autoplayOverlayProgress &&
+        child !== notificationsEl
       ) {
         child.remove();
       }
@@ -155,8 +161,7 @@ export class ViewerRenderer {
 
     const newChildren: Node[] = [
       renderCenterMessage(renderState, this.i18n),
-      renderArrowButtons({ state: renderState, callbacks: this.callbacks }),
-      renderNotifications(state)
+      renderArrowButtons({ state: renderState, callbacks: this.callbacks })
     ];
 
     this.syncResizeHandle(state.layout.mode === "wide");
@@ -175,10 +180,14 @@ export class ViewerRenderer {
     if (controlsDockEl.parentNode !== this.root) {
       this.root.appendChild(controlsDockEl);
     }
+    if (notificationsEl.parentNode !== this.root) {
+      this.root.appendChild(notificationsEl);
+    }
 
     this.menuPanel.update(renderState);
     this.viewModeSwitcher?.update(renderState);
     this.controlsDock.update(renderState, this.isMobileViewport());
+    this.notifications.update(state);
 
     this.syncAutoplayOverlayProgress(state);
 
