@@ -490,7 +490,7 @@ export const controlsDockStyles = `
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 5px;
   z-index: 50;
   pointer-events: none;
   overflow: hidden;
