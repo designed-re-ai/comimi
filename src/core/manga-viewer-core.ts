@@ -36,6 +36,8 @@ export class MangaViewerCore implements MangaViewerInstance {
   private autoTimer?: number;
   private mobileMediaQuery?: MediaQueryList;
   private lockLayoutMode = false;
+  // browserFullscreen 中に退避した body の overflow（未ロック時は null）。
+  private bodyOverflowBackup: string | null = null;
 
   constructor(
     private container: HTMLElement,
@@ -123,6 +125,7 @@ export class MangaViewerCore implements MangaViewerInstance {
       window.clearTimeout(timer);
     }
     this.notificationTimers.clear();
+    this.syncBodyScrollLock("inline");
     this.unsubscribers.forEach((unsubscribe) => unsubscribe());
     this.assetLoader.revokeAll();
     this.renderer.destroy();
@@ -462,6 +465,26 @@ export class MangaViewerCore implements MangaViewerInstance {
   private afterStateChange(state: ViewerState, previous: ViewerState): void {
     if (state.autoPageTurnEnabled !== previous.autoPageTurnEnabled) {
       this.syncAutoTimer();
+    }
+    if (state.layout.mode !== previous.layout.mode) {
+      this.syncBodyScrollLock(state.layout.mode);
+    }
+  }
+
+  // CSS 全画面（browserFullscreen）はビューワーを position:fixed で重ねるだけで
+  // 背後の Web ページはスクロールできてしまうため、body のスクロールをロックする。
+  // nativeFullscreen は Fullscreen API がページ自体を隠すので対象外。
+  private syncBodyScrollLock(layoutMode: LayoutMode): void {
+    if (typeof document === "undefined") {
+      return;
+    }
+    const shouldLock = layoutMode === "browserFullscreen";
+    if (shouldLock && this.bodyOverflowBackup === null) {
+      this.bodyOverflowBackup = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    } else if (!shouldLock && this.bodyOverflowBackup !== null) {
+      document.body.style.overflow = this.bodyOverflowBackup;
+      this.bodyOverflowBackup = null;
     }
   }
 
