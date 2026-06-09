@@ -1,6 +1,10 @@
 import type { ViewerSettings } from "../types";
 
-type StoreName = "settings" | "readingProgress" | "layout";
+type StoreName =
+  | "settings"
+  | "readingProgress"
+  | "layout"
+  | "mangaSettings";
 
 export interface StorageOptions {
   enabled?: boolean;
@@ -17,15 +21,41 @@ export class IndexedDbStorage {
     this.databaseName = options.databaseName ?? "manga-viewer";
   }
 
-  async getSettings(): Promise<ViewerSettings | undefined> {
-    const record = await this.get<{ value: ViewerSettings }>("settings", "global");
+  async getSettings(): Promise<Partial<ViewerSettings> | undefined> {
+    const record = await this.get<{ value: Partial<ViewerSettings> }>(
+      "settings",
+      "global"
+    );
     return record?.value;
   }
 
-  async saveSettings(settings: ViewerSettings): Promise<void> {
+  async saveSettings(settings: Partial<ViewerSettings>): Promise<void> {
     await this.put("settings", {
       id: "global",
       value: settings,
+      updatedAt: Date.now()
+    });
+  }
+
+  /** 作品ごとに保持する設定（pageTurnMode / hasCover / readingDirection 等）。 */
+  async getMangaSettings(
+    mangaId: string
+  ): Promise<Partial<ViewerSettings> | undefined> {
+    const record = await this.get<{ value: Partial<ViewerSettings> }>(
+      "mangaSettings",
+      mangaId
+    );
+    return record?.value;
+  }
+
+  async saveMangaSettings(
+    mangaId: string,
+    settings: Partial<ViewerSettings>
+  ): Promise<void> {
+    const existing = await this.getMangaSettings(mangaId);
+    await this.put("mangaSettings", {
+      mangaId,
+      value: { ...existing, ...settings },
       updatedAt: Date.now()
     });
   }
@@ -102,13 +132,14 @@ export class IndexedDbStorage {
     }
 
     this.dbPromise ??= new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.databaseName, 1);
+      const request = indexedDB.open(this.databaseName, 2);
 
       request.onupgradeneeded = () => {
         const db = request.result;
         createStore(db, "settings", "id");
         createStore(db, "readingProgress", "mangaId");
         createStore(db, "layout", "id");
+        createStore(db, "mangaSettings", "mangaId");
       };
 
       request.onsuccess = () => resolve(request.result);

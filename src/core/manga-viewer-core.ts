@@ -24,6 +24,39 @@ import type {
 import { AssetLoader } from "./asset-loader";
 import { EventEmitter } from "./event-emitter";
 
+// 作品ごとに記憶する設定キー。これらは global の `settings` ではなく
+// 作品ID単位の `mangaSettings` ストアに保存する。
+const PER_MANGA_SETTING_KEYS = [
+  "pageTurnMode",
+  "hasCover",
+  "readingDirection"
+] as const;
+type PerMangaSettingKey = (typeof PER_MANGA_SETTING_KEYS)[number];
+
+/** 作品ごとキーを除いた global 用の設定スナップショットを返す。 */
+function stripPerMangaSettings(
+  settings: ViewerSettings
+): Partial<ViewerSettings> {
+  const out: Partial<ViewerSettings> = { ...settings };
+  for (const key of PER_MANGA_SETTING_KEYS) {
+    delete out[key];
+  }
+  return out;
+}
+
+/** 設定の差分から作品ごとキーだけを抜き出す。 */
+function pickPerMangaSettings(
+  settings: Partial<ViewerSettings>
+): Partial<ViewerSettings> {
+  const out: Partial<ViewerSettings> = {};
+  for (const key of PER_MANGA_SETTING_KEYS) {
+    if (key in settings) {
+      out[key] = settings[key] as never;
+    }
+  }
+  return out;
+}
+
 export class MangaViewerCore implements MangaViewerInstance {
   private store: ViewerStore;
   private storage: IndexedDbStorage;
@@ -40,6 +73,8 @@ export class MangaViewerCore implements MangaViewerInstance {
   private lockLayoutMode = false;
   // 保存値より初期値を優先する設定キー（forceSettings オプション由来）。
   private forceSettings: ReadonlySet<keyof ViewerSettings> = new Set();
+  // 作品ごと設定の「開発者指定デフォルト」。保存値が無い作品に適用する。
+  private baseMangaSettings: Pick<ViewerSettings, PerMangaSettingKey>;
   // browserFullscreen 中に退避した body の overflow（未ロック時は null）。
   private bodyOverflowBackup: string | null = null;
 
@@ -54,6 +89,11 @@ export class MangaViewerCore implements MangaViewerInstance {
 
     this.lockLayoutMode = options.lockLayoutMode ?? false;
     this.forceSettings = new Set(options.forceSettings ?? []);
+    this.baseMangaSettings = {
+      pageTurnMode: settings.pageTurnMode,
+      hasCover: settings.hasCover,
+      readingDirection: settings.readingDirection
+    };
     this.storage = new IndexedDbStorage(options.storage);
     this.assetLoader = new AssetLoader();
     this.i18n = new I18n(settings.locale, options.translations);
@@ -146,7 +186,12 @@ export class MangaViewerCore implements MangaViewerInstance {
 
   async setManga(manga: Manga): Promise<void> {
     const pageIndex = (await this.storage.getProgress(manga.id)) ?? 0;
+    if (this.destroyed) {
+      return;
+    }
     this.store.dispatch({ type: "setManga", manga, pageIndex });
+    // 作品ごと設定を新しい作品のものへ切り替える（保存値が無ければデフォルト）。
+    await this.applyMangaSettings(manga.id);
   }
 
   async setPages(pages: MangaPage[]): Promise<void> {
@@ -169,8 +214,39 @@ export class MangaViewerCore implements MangaViewerInstance {
     this.store.dispatch({ type: "updateSettings", settings: toApply });
     const nextSettings = this.store.getState().settings;
     this.i18n.setLocale(nextSettings.locale);
-    await this.storage.saveSettings(nextSettings);
+
+    // 作品ごとのキーは作品ID単位、それ以外は global に保存する。
+    await this.storage.saveSettings(stripPerMangaSettings(nextSettings));
+    const perManga = pickPerMangaSettings(toApply);
+    if (Object.keys(perManga).length > 0) {
+      await this.storage.saveMangaSettings(
+        this.store.getState().manga.id,
+        perManga
+      );
+    }
+
     this.events.emit("settingsChange", { settings: nextSettings });
+  }
+
+  /**
+   * 指定作品の「作品ごと設定」をストアに反映する。
+   * まず開発者デフォルトへ戻し、保存値があれば上書きする
+   * （forceSettings のキーは常にデフォルト優先）。
+   */
+  private async applyMangaSettings(mangaId: string): Promise<void> {
+    const merged: Partial<ViewerSettings> = { ...this.baseMangaSettings };
+    const saved = await this.storage.getMangaSettings(mangaId);
+    if (this.destroyed) {
+      return;
+    }
+    if (saved) {
+      for (const key of PER_MANGA_SETTING_KEYS) {
+        if (!this.forceSettings.has(key) && key in saved) {
+          merged[key] = saved[key] as never;
+        }
+      }
+    }
+    this.store.dispatch({ type: "updateSettings", settings: merged });
   }
 
   goToPage(pageIndex: number): void {
@@ -269,6 +345,7 @@ export class MangaViewerCore implements MangaViewerInstance {
     }>();
     const mangaId = this.store.getState().manga.id;
     const progress = await this.storage.getProgress(mangaId);
+    const savedMangaSettings = await this.storage.getMangaSettings(mangaId);
 
     // await 中に destroy された場合は何もしない（StrictMode の
     // mount→unmount→mount で破棄済みインスタンスが DOM を触るのを防ぐ）。
@@ -281,11 +358,32 @@ export class MangaViewerCore implements MangaViewerInstance {
       if (this.lockLayoutMode) {
         delete settingsToApply.layoutMode;
       }
+      // 作品ごとキーは global からは適用しない（旧バージョンの保存値対策）。
+      for (const key of PER_MANGA_SETTING_KEYS) {
+        delete settingsToApply[key];
+      }
       // forceSettings に挙げたキーは初期値を優先するため保存値を捨てる。
       for (const key of this.forceSettings) {
         delete settingsToApply[key];
       }
       this.store.dispatch({ type: "updateSettings", settings: settingsToApply });
+    }
+
+    // 作品ごと設定（保存値があれば）を適用する。
+    // 初期状態には開発者デフォルトが入っているので、無ければそのまま。
+    if (savedMangaSettings) {
+      const perMangaToApply: Partial<ViewerSettings> = {};
+      for (const key of PER_MANGA_SETTING_KEYS) {
+        if (!this.forceSettings.has(key) && key in savedMangaSettings) {
+          perMangaToApply[key] = savedMangaSettings[key] as never;
+        }
+      }
+      if (Object.keys(perMangaToApply).length > 0) {
+        this.store.dispatch({
+          type: "updateSettings",
+          settings: perMangaToApply
+        });
+      }
     }
     if (
       !this.lockLayoutMode &&
@@ -505,7 +603,9 @@ export class MangaViewerCore implements MangaViewerInstance {
     }
 
     this.store.dispatch({ type: "setLayoutMode", layoutMode });
-    await this.storage.saveSettings(this.store.getState().settings);
+    await this.storage.saveSettings(
+      stripPerMangaSettings(this.store.getState().settings)
+    );
     await this.storage.saveLayout(this.store.getState().layout);
     this.events.emit("layoutChange", { layoutMode });
   }

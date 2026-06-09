@@ -246,9 +246,12 @@ createMangaViewer(container, {
 
 `storage.enabled` を `false` にしない限り、`indexedDB` が利用可能な環境では以下を自動で保存します。
 
-- 全体設定（locale, readingDirection, hasCover, pageTurnMode, autoPageTurnIntervalMs, backgroundColor）
+- **全体設定**（locale, autoPageTurnIntervalMs, backgroundColor, zoom）
+- **作品ごとの設定**（`pageTurnMode`, `hasCover`, `readingDirection`）— `manga.id` をキーに保存
 - 現在のレイアウトモードと wide の高さ
-- 漫画ごとの現在ページ（`manga.id` をキーに保存）
+- 作品ごとの現在ページ（`manga.id` をキーに保存）
+
+`pageTurnMode` / `hasCover` / `readingDirection` は作品ごとに記憶されます。保存値がまだ無い作品では、`settings` オプション（無ければ組み込みデフォルト）の値が使われ、変更するとその作品に対して記憶されます。別の作品へ切り替えると、その作品の保存値（無ければデフォルト）に戻ります。
 
 データベース名は既定で `manga-viewer`。`storage.databaseName` で上書きできます。
 
