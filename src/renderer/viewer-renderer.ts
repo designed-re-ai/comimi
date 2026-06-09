@@ -461,7 +461,11 @@ export class ViewerRenderer {
 
     const onMove = (event: PointerEvent) => {
       if (event.pointerId !== activePointerId) return;
-      this.callbacks.setWideHeight(startHeight + event.clientY - startY);
+      // min-height: 450px / max-height: 85vh に合わせてクランプする。
+      const requested = startHeight + event.clientY - startY;
+      const max = window.innerHeight * 0.85;
+      const clamped = Math.min(Math.max(requested, 450), max);
+      this.callbacks.setWideHeight(clamped);
     };
     const onUp = (event: PointerEvent) => {
       if (event.pointerId !== activePointerId) return;

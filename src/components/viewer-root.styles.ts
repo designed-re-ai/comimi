@@ -50,7 +50,8 @@ export const viewerRootStyles = `
   width: 100%;
   max-width: none;
   aspect-ratio: auto;
-  min-height: 320px;
+  min-height: 450px;
+  max-height: 85vh;
   margin: 0;
   border-radius: 0;
   box-shadow: none;

@@ -106,7 +106,7 @@ export function reducer(state: ViewerState, action: ViewerAction): ViewerState {
         ...state,
         layout: {
           ...state.layout,
-          wideHeightPx: Math.max(240, Math.round(action.heightPx))
+          wideHeightPx: Math.max(450, Math.round(action.heightPx))
         }
       };
 
