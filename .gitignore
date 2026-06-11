@@ -1,6 +1,10 @@
 node_modules/
+comimi/
 dist/
 .DS_Store
 .claude/
 *.log
 .vite/
+Dockerfile
+build.sh
+entrypoint.sh
