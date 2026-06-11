@@ -75,6 +75,10 @@ export class PageStage {
   }
 
   update(state: ViewerState, isMobile: boolean): void {
+    if (state.settings.readingDirection === "vertical") {
+      this.updateVertical(state, isMobile);
+      return;
+    }
     const groupSpecs = getPreloadedPageGroups(state, isMobile);
     const newGroups: HTMLDivElement[] = [];
 
@@ -112,6 +116,29 @@ export class PageStage {
       newGroups.push(groupEl);
     }
 
+    this.root.replaceChildren(...newGroups);
+  }
+
+  private updateVertical(state: ViewerState, isMobile: boolean): void {
+    const currentPage = state.manga.pages[state.currentPageIndex];
+    if (!currentPage) return;
+    const newGroups: HTMLDivElement[] = [];
+    const groupEl = document.createElement("div");
+    groupEl.className = "comimi-page-group";
+    groupEl.dataset.placement = "center";
+    groupEl.dataset.side = "single";
+    groupEl.style.transform = "";
+    const cached = this.getOrBuildSlot(state, currentPage, state.currentPageIndex, false);
+    cached.slot.dataset.spread = "false";
+    cached.slot.dataset.position = "single";
+    cached.slot.dataset.pageIndex = String(state.currentPageIndex);
+    if (cached.img) {
+      const applyZoom =
+        state.zoomPageIndex === null || state.zoomPageIndex === state.currentPageIndex;
+      cached.img.style.transform = applyZoom ? pageTransform(state) : "";
+    }
+    groupEl.append(cached.slot);
+    newGroups.push(groupEl);
     this.root.replaceChildren(...newGroups);
   }
 

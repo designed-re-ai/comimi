@@ -1,4 +1,4 @@
-export type ReadingDirection = "rtl" | "ltr";
+export type ReadingDirection = "rtl" | "ltr" | "vertical";
 export type PageTurnMode = "single" | "spread";
 export type BackgroundColor = "white" | "black";
 export type LayoutMode =
